@@ -1,0 +1,28 @@
+name: Scheduled Retrain
+
+# Weekly retraining pipeline. Demonstrates automated, metric-gated promotion.
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: |
+          pip install -r requirements.txt
+          pip install -e .
+      - name: Run pipeline
+        run: |
+          python -m goalcast.data.ingest
+          python -m goalcast.features.build
+          python -m goalcast.models.train
+          python -m goalcast.models.evaluate
+      - name: Promote if better
+        run: python -m goalcast.models.registry --promote

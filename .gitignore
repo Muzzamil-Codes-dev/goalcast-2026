@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Env / secrets
+.env
+
+# Data (DVC-tracked)
+data/raw/*
+data/processed/*
+data/features/*
+*.db
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/features/.gitkeep
+
+# Models / experiments
+models/artifacts/*
+!models/artifacts/.gitkeep
+mlruns/
+mlartifacts/
+mlflow.db
+.chroma/
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

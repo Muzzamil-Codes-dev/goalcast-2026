@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: goalcast
+      POSTGRES_PASSWORD: goalcast
+      POSTGRES_DB: goalcast
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U goalcast"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: { context: ., dockerfile: Dockerfile.api }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://goalcast:goalcast@db:5432/goalcast
+    depends_on:
+      db: { condition: service_healthy }
+    ports: ["8000:8000"]
+
+  dashboard:
+    build: { context: ., dockerfile: Dockerfile.dashboard }
+    env_file: .env
+    environment:
+      API_URL: http://api:8000
+    depends_on: [api]
+    ports: ["8501:8501"]
+
+volumes:
+  pgdata:
